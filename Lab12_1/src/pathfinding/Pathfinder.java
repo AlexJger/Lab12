@@ -1,4 +1,5 @@
-import WeightedGraph.Mode;
+package pathfinding;
+import pathfinding.WeightedGraph.Mode;
 
 public class Pathfinder {
 	
@@ -6,7 +7,7 @@ public class Pathfinder {
 		
 		double[][] adjMat = getAdjacencyMatrix();
 		
-		WeightedGraph graph = new WeightedGrahp(adjMat);
+		WeightedGraph graph = new WeightedGraph(adjMat);
 		System.out.println(graph);
 		System.out.println(graph.dijkstra(0, 4, Mode.CHEAPEST));
 		System.out.println(graph.dijkstra(0, 4, Mode.SHORTEST));

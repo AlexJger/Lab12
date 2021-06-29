@@ -1,3 +1,4 @@
+package pathfinding;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -12,8 +13,8 @@ public class WeightedGraph implements Graph {
 	
 	public WeightedGraph(int nodes, int edges) {
 		rand = new Random();
-		adjacencyMatrix = createAdjecencyMatrix(nodes, edges);
-		graph = createGraphFromAdjacencyMatrix(adjacencyMatrix);
+		adjacencyMatrix = createAdjacencyMatrix(nodes, edges);
+		graph = createGraphFromAdjacencyMatrix(adjacencyMatrix, names);
 	}
 	
 	public WeightedGraph(double[][] adjacencyMatrix) {
@@ -37,7 +38,7 @@ public class WeightedGraph implements Graph {
 		
 	}
 	
-	private double[][] createAjacencyMatrix(int nodes, int edges){
+	private double[][] createAdjacencyMatrix(int nodes, int edges){
 		
 	}
 	

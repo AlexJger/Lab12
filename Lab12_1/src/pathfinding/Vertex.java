@@ -22,6 +22,10 @@ public class Vertex implements Node {
 	}
 	
 	public void reset() {
+		neighbours.clear();
+		explored = false;
+		distanceFromStartingNode = Double.POSITIVE_INFINITY;
+		previousNode = null;
 		
 	}
 	
@@ -30,7 +34,7 @@ public class Vertex implements Node {
 	}
 	
 	public void addNeighbour(Node node, double distance) {
-		
+		neighbours.put((Vertex)node, distance);
 	}
 	
 	public boolean setDistanceAndPrevNode(double shortestDistanceCanddate, Node prevNodeCandidate) {
@@ -62,6 +66,14 @@ public class Vertex implements Node {
 	
 	public String getName() {
 		return name;
+	}
+	
+	public String printNeighbours() {
+		String result = "";
+		for (Vertex v : neighbours.keySet()) {
+			result = result + v.getName() + " (" + neighbours.get(v) + ")  ";
+		}
+		return result;
 	}
 	
 	public double getDistanceFromStartingNode() {

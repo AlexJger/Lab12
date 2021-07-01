@@ -13,6 +13,8 @@ public class Pathfinder {
 		
 		System.out.println(graph);
 		System.out.println(graph2);
+		
+		graph.dijkstra(0, 3, Mode.SHORTEST);
 		/*System.out.println(graph.dijkstra(0, 4, Mode.CHEAPEST));
 		System.out.println(graph.dijkstra(0, 4, Mode.SHORTEST));
 		

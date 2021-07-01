@@ -2,6 +2,7 @@ package pathfinding;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.PriorityQueue;
 import java.util.Random;
 
 //import sun.security.provider.certpath.Vertex;
@@ -33,7 +34,35 @@ public class WeightedGraph implements Graph {
 	}
 	
 	public String dijkstra(int start, int end, Mode mode) {
-		return "";
+		String result = "";
+		if (mode == Mode.CHEAPEST) {
+			//still to be implemented
+		}
+		if (mode == Mode.SHORTEST) {
+			//code from lecture videos
+			PriorityQueue<Vertex> dist = new PriorityQueue<>();
+			for(Vertex v : graph) {
+				v.setDistanceAndPrevNode(Double.POSITIVE_INFINITY, null);
+				v.setExplored(false);
+				dist.add(v); //got error message here, vertex has to become compatible with java.lang.Comparable: Exception in thread "main" java.lang.ClassCastException: class pathfinding.Vertex cannot be cast to class java.lang.Comparable (pathfinding.Vertex is in unnamed module of loader 'app'; java.lang.Comparable is in module java.base of loader 'bootstrap') 
+			}
+			graph.get(start).setDistanceAndPrevNode(0, null);
+			while (graph.get(end).getExplored() == false) {
+				Vertex v = 	dist.poll();
+				graph.get(v.getIndex()).explore(Mode.SHORTEST);
+			}
+			
+			double pathlength = graph.get(end).getDistanceFromStartingNode();
+			result = graph.get(end).getName() + "\n";
+			for (Vertex prev = (Vertex) graph.get(end).getPreviousNode(); prev.getPreviousNode() != null; prev = (Vertex) prev.getPreviousNode()) {
+				result = prev.getName() + "\n" + result;
+			}
+			result = "The shortest path from " + graph.get(start).getName() + " to " + graph.get(end).getName() + ": \n" + result;
+			result = result + "The pathlength is: " + pathlength + ". \n";
+		}
+		else { result = "There is no such mode."; }
+		
+		return result;
 	}
 	
 	private Vertex nextNodeToExplore() {

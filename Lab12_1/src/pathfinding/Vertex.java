@@ -30,16 +30,38 @@ public class Vertex implements Node {
 	}
 	
 	public void explore(Mode mode) {
+		explored = true;
+		if (mode == Mode.CHEAPEST) {
+			for (Vertex v : neighbours.keySet()) {
+				v.setDistanceAndPrevNode(distanceFromStartingNode + neighbours.get(v), getVertex() /*vertex itself, the one that was set to explored*/);
+				
+			}
+		}
+		if (mode == Mode.SHORTEST) {
+			for (Vertex v : neighbours.keySet()) {
+				v.setDistanceAndPrevNode(distanceFromStartingNode ++, getVertex()/*vertex itself, the one that was set to explored*/);
+				
+			}
+		}
 		
+	}
+	
+	public void setExplored(boolean bool) {
+		explored = bool;
 	}
 	
 	public void addNeighbour(Node node, double distance) {
 		neighbours.put((Vertex)node, distance);
 	}
 	
-	public boolean setDistanceAndPrevNode(double shortestDistanceCanddate, Node prevNodeCandidate) {
-		
-		return false;
+	public boolean setDistanceAndPrevNode(double shortestDistanceCandidate, Node prevNodeCandidate) {
+		if(shortestDistanceCandidate < distanceFromStartingNode) {
+			this.distanceFromStartingNode = shortestDistanceCandidate;
+			this.previousNode = (Vertex) prevNodeCandidate;
+			return true;
+		}else {	
+			return false;
+		}
 	}
 	
 	@Override
@@ -48,6 +70,15 @@ public class Vertex implements Node {
 		return index == v.getIndex();
 	}
 
+	//not sure if this is clever... it basically creates a new vertex, will it behave like the one it is?
+	public Vertex getVertex() {
+		Vertex v = new Vertex(getIndex(), getName());
+		v.neighbours = getNeighbours();
+		v.explored = getExplored();
+		v.setDistanceAndPrevNode(getDistanceFromStartingNode(), getPreviousNode());
+		return v;
+	}
+	
 	public HashMap<Vertex, Double> getNeighbours(){
 		return neighbours;
 	}

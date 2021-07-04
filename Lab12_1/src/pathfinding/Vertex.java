@@ -22,46 +22,38 @@ public class Vertex implements Node {
 	}
 	
 	public void reset() {
-		neighbours.clear();
-		explored = false;
-		distanceFromStartingNode = Double.POSITIVE_INFINITY;
-		previousNode = null;
+		//neighbours.clear();
+		this.explored = false;
+		this.distanceFromStartingNode = Double.POSITIVE_INFINITY;
+		this.previousNode = null;
 		
 	}
 	
 	public void explore(Mode mode) {
-		explored = true;
-		if (mode == Mode.CHEAPEST) {
-			for (Vertex v : neighbours.keySet()) {
-				v.setDistanceAndPrevNode(distanceFromStartingNode + neighbours.get(v), getVertex() /*vertex itself, the one that was set to explored*/);
-				
+		if(mode==Mode.CHEAPEST) {
+			this.explored=true;
+			for(Vertex v : neighbours.keySet()) {
+				if(v.getExplored()==false && v.getDistanceFromStartingNode()>neighbours.get(v)+this.getDistanceFromStartingNode())
+				v.setDistanceAndPrevNode((neighbours.get(v)+this.getDistanceFromStartingNode()), this);
 			}
 		}
-		if (mode == Mode.SHORTEST) {
-			for (Vertex v : neighbours.keySet()) {
-				v.setDistanceAndPrevNode(distanceFromStartingNode ++, getVertex()/*vertex itself, the one that was set to explored*/);
-				
+		if(mode==Mode.SHORTEST) {
+			this.explored=true;
+			for(Vertex v : neighbours.keySet()) {
+				if(v.getExplored()==false && v.getDistanceFromStartingNode()>this.getDistanceFromStartingNode())
+					v.setDistanceAndPrevNode((this.distanceFromStartingNode+1), this);
 			}
 		}
-		
-	}
-	
-	public void setExplored(boolean bool) {
-		explored = bool;
 	}
 	
 	public void addNeighbour(Node node, double distance) {
 		neighbours.put((Vertex)node, distance);
 	}
 	
-	public boolean setDistanceAndPrevNode(double shortestDistanceCandidate, Node prevNodeCandidate) {
-		if(shortestDistanceCandidate < distanceFromStartingNode) {
-			this.distanceFromStartingNode = shortestDistanceCandidate;
-			this.previousNode = (Vertex) prevNodeCandidate;
-			return true;
-		}else {	
-			return false;
-		}
+	public boolean setDistanceAndPrevNode(double shortestDistanceCanddate, Node prevNodeCandidate) {
+		this.distanceFromStartingNode=shortestDistanceCanddate;
+		this.previousNode= (Vertex) prevNodeCandidate;
+		return true;
 	}
 	
 	@Override
@@ -70,15 +62,6 @@ public class Vertex implements Node {
 		return index == v.getIndex();
 	}
 
-	//not sure if this is clever... it basically creates a new vertex, will it behave like the one it is?
-	public Vertex getVertex() {
-		Vertex v = new Vertex(getIndex(), getName());
-		v.neighbours = getNeighbours();
-		v.explored = getExplored();
-		v.setDistanceAndPrevNode(getDistanceFromStartingNode(), getPreviousNode());
-		return v;
-	}
-	
 	public HashMap<Vertex, Double> getNeighbours(){
 		return neighbours;
 	}

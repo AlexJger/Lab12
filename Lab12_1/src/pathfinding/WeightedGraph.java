@@ -2,7 +2,6 @@ package pathfinding;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.PriorityQueue;
 import java.util.Random;
 
 //import sun.security.provider.certpath.Vertex;
@@ -34,40 +33,59 @@ public class WeightedGraph implements Graph {
 	}
 	
 	public String dijkstra(int start, int end, Mode mode) {
-		String result = "";
-		if (mode == Mode.CHEAPEST) {
-			//still to be implemented
-		}
-		if (mode == Mode.SHORTEST) {
-			//code from lecture videos
-			PriorityQueue<Vertex> dist = new PriorityQueue<>();
-			for(Vertex v : graph) {
-				v.setDistanceAndPrevNode(Double.POSITIVE_INFINITY, null);
-				v.setExplored(false);
-				dist.add(v); //got error message here, vertex has to become compatible with java.lang.Comparable: Exception in thread "main" java.lang.ClassCastException: class pathfinding.Vertex cannot be cast to class java.lang.Comparable (pathfinding.Vertex is in unnamed module of loader 'app'; java.lang.Comparable is in module java.base of loader 'bootstrap') 
-			}
-			graph.get(start).setDistanceAndPrevNode(0, null);
-			while (graph.get(end).getExplored() == false) {
-				Vertex v = 	dist.poll();
-				graph.get(v.getIndex()).explore(Mode.SHORTEST);
-			}
-			
-			double pathlength = graph.get(end).getDistanceFromStartingNode();
-			result = graph.get(end).getName() + "\n";
-			for (Vertex prev = (Vertex) graph.get(end).getPreviousNode(); prev.getPreviousNode() != null; prev = (Vertex) prev.getPreviousNode()) {
-				result = prev.getName() + "\n" + result;
-			}
-			result = "The shortest path from " + graph.get(start).getName() + " to " + graph.get(end).getName() + ": \n" + result;
-			result = result + "The pathlength is: " + pathlength + ". \n";
-		}
-		else { result = "There is no such mode."; }
+		if(start==end)return dijkstraForRandomPoints(mode);
+		if(graph.get(start).getNeighbours().isEmpty()||graph.get(end).getNeighbours().isEmpty())return "There is no path from " + graph.get(start).getName() + " to " + graph.get(end).getName();
 		
-		return result;
+		if(mode==Mode.CHEAPEST){
+		reset();
+		//set distance from start to 0
+		graph.get(start).setDistanceAndPrevNode(0, null);
+		Vertex v = graph.get(start);
+		while(graph.get(end).getExplored()==false) {
+			v.explore(mode);
+			v = nextNodeToExplore();
+			}
+		}
+		
+		if(mode==Mode.SHORTEST) {
+			reset();
+			//set distance from start to 0
+			graph.get(start).setDistanceAndPrevNode(0, null);
+			Vertex v = graph.get(start);
+			while(graph.get(end).getExplored()==false) {
+				v.explore(mode);
+				v = nextNodeToExplore();
+				}
+		}
+		
+		String resultStr = "";
+		double pathlength = graph.get(end).getDistanceFromStartingNode();
+		
+		Vertex prev = (Vertex) graph.get(end);
+		resultStr=prev.getName()+"\n";
+		while ( prev.getPreviousNode() != null) {
+			if(prev.getPreviousNode()!=null) {
+			prev = (Vertex) prev.getPreviousNode(); 
+			resultStr = prev.getName() + " --> " + resultStr;
+			//.out.println("str "+prev.getName());
+			}
+		}
+		resultStr = "The shortest path from " + graph.get(start).getName() + " to " + graph.get(end).getName() + ": \n" + resultStr;
+		resultStr = resultStr + "The pathlength is: " + pathlength + ". \n";
+		
+		return resultStr;
 	}
 	
 	private Vertex nextNodeToExplore() {
-		Vertex dummy = new Vertex(0, "fhhefbekrjf");
-		return dummy;
+		double minValue = Double.POSITIVE_INFINITY;
+		Vertex result=null;
+		for(Vertex v : graph) {
+			if(v.getExplored()==false && v.getDistanceFromStartingNode()<minValue && v.getDistanceFromStartingNode()!=0) {
+				minValue=v.getDistanceFromStartingNode();
+				result=v;
+			}
+		} 
+		return result;
 	}
 	
 	private double[][] createAdjacencyMatrix(int nodes, int edges){
@@ -85,6 +103,7 @@ public class WeightedGraph implements Graph {
 			int j = rand.nextInt(nodes);
 			if(adjacencyMatrix[i][j] == Double.POSITIVE_INFINITY && i != j ) {
 				adjacencyMatrix[i][j] = (double) rand.nextInt(1000); //nextDouble() doesn't have a bound....
+				adjacencyMatrix[j][i]=adjacencyMatrix[i][j];
 				edges --;
 			}
 		}
@@ -95,15 +114,16 @@ public class WeightedGraph implements Graph {
 		//matrix durchgehen, für jeden index (siehe seitenlänge) neuer vertex mit element aus names(passend zu index)
 		for(int i=0; i<adjMatrix.length; i++) {
 			Vertex v = new Vertex(i, names[i]);
-			
+			graph.add(v);
+		}
 			//vertex --> neighbours hinzufügen; dann zu arraylist graph
+		for(int i=0; i<adjMatrix.length; i++) {
+			Vertex v = graph.get(i);
 			for(int j=0; j<adjMatrix.length; j++) {
 				if(adjMatrix[i][j] != Double.POSITIVE_INFINITY) {
-					Vertex nb = new Vertex(j, names[j]);
-					v.addNeighbour(nb, adjMatrix[i][j]);
+					v.addNeighbour(graph.get(j), adjMatrix[i][j]);
 				}
 			}
-			graph.add(v);
 		}
 		return graph;
 	}
@@ -119,7 +139,6 @@ public class WeightedGraph implements Graph {
 		for(Vertex v : graph) {
 			result = result + v.getName() + ": " + v.printNeighbours() + "\n";
 		}
-		
 		return result;
 	}
 	
@@ -127,24 +146,40 @@ public class WeightedGraph implements Graph {
 		NameParser nm = new NameParser();
 		String[] namesR = null;
 		try {
-			HashSet<String> namesSet = nm.parseNames("C:\\Users\\Wolfsmond\\Documents\\Studium\\Medieninformatik_Studium\\2.Sem\\Informatik2\\Labs\\Lab12\\lab12-gitRepo\\Lab12\\WeightedGraphNames.txt");
+			HashSet<String> namesSet = nm.parseNames("src\\pathfinding\\WeightedGraphNames.txt");
 			namesR = namesSet.toArray(new String[namesSet.size()]);
-		} catch (Exception e){
+		} catch (FileNotFoundException e){
 			e.printStackTrace();
-
+			
 			//throw new FileNotFoundException("File not found");
 		}
-		//System.out.println(namesR[0]);
 		return namesR;
 	}
-	
-	public int getVertexCount() {
-		return graph.size();
-	}
-	
-	public int getEdgeCount() {
-		return 0;
-	}
+
+	//not used
+//	public int getVertexCount() {
+//		if(graph!=null) return graph.size();
+//		else if(adjacencyMatrix!=null) return adjacencyMatrix.length;
+//		else return 0;
+//	}
+//	
+//	public int getEdgeCount() {
+//		int counter=0;
+//		if(graph!=null) {
+//		for(Vertex v: graph) {
+//			 HashMap<Vertex, Double> neigh = new HashMap<>();
+//			 neigh = v.getNeighbours();
+//			 counter+=neigh.size();
+//			}
+//		} else if(adjacencyMatrix!=null) {
+//			for(double[] v : adjacencyMatrix) {
+//				for(double weight : v) {
+//					if(weight!=Double.POSITIVE_INFINITY) counter++;
+//				}
+//			}
+//		}
+//		return counter;
+//	}
 	
 	public enum Mode{
 		CHEAPEST, SHORTEST

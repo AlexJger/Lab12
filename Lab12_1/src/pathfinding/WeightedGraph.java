@@ -34,9 +34,9 @@ public class WeightedGraph implements Graph {
 	
 	public String dijkstra(int start, int end, Mode mode) {
 		if(start==end)return dijkstraForRandomPoints(mode);
-		if(graph.get(start).getNeighbours().isEmpty()||graph.get(end).getNeighbours().isEmpty())return "There is no path from " + graph.get(start).getName() + " to " + graph.get(end).getName();
+		if(graph.get(start).getNeighbours().isEmpty()||graph.get(end).getNeighbours().isEmpty())
+			return "There is no path from " + graph.get(start).getName() + " to " + graph.get(end).getName();
 		
-		if(mode==Mode.CHEAPEST){
 		reset();
 		//set distance from start to 0
 		graph.get(start).setDistanceAndPrevNode(0, null);
@@ -45,35 +45,8 @@ public class WeightedGraph implements Graph {
 			v.explore(mode);
 			v = nextNodeToExplore();
 			}
-		}
 		
-		if(mode==Mode.SHORTEST) {
-			reset();
-			//set distance from start to 0
-			graph.get(start).setDistanceAndPrevNode(0, null);
-			Vertex v = graph.get(start);
-			while(graph.get(end).getExplored()==false) {
-				v.explore(mode);
-				v = nextNodeToExplore();
-				}
-		}
-		
-		String resultStr = "";
-		double pathlength = graph.get(end).getDistanceFromStartingNode();
-		
-		Vertex prev = (Vertex) graph.get(end);
-		resultStr=prev.getName()+"\n";
-		while ( prev.getPreviousNode() != null) {
-			if(prev.getPreviousNode()!=null) {
-			prev = (Vertex) prev.getPreviousNode(); 
-			resultStr = prev.getName() + " --> " + resultStr;
-			//.out.println("str "+prev.getName());
-			}
-		}
-		resultStr = "The shortest path from " + graph.get(start).getName() + " to " + graph.get(end).getName() + ": \n" + resultStr;
-		resultStr = resultStr + "The pathlength is: " + pathlength + ". \n";
-		
-		return resultStr;
+		return printsPath(start, end, mode);
 	}
 	
 	private Vertex nextNodeToExplore() {
@@ -154,6 +127,24 @@ public class WeightedGraph implements Graph {
 			//throw new FileNotFoundException("File not found");
 		}
 		return namesR;
+	}
+	
+	private String printsPath(int start, int end, Mode mode) {
+		String resultStr = "";
+		double pathlength = graph.get(end).getDistanceFromStartingNode();
+		
+		Vertex prev = (Vertex) graph.get(end);
+		resultStr=prev.getName()+"\n";
+		while ( prev.getPreviousNode() != null) {
+			if(prev.getPreviousNode()!=null) {
+			prev = (Vertex) prev.getPreviousNode(); 
+			resultStr = prev.getName() + " --> " + resultStr;
+			}
+		}
+		resultStr = "The "+mode.toString()+" path from " + graph.get(start).getName() + " to " + graph.get(end).getName() + ": \n" + resultStr;
+		resultStr = resultStr + "The pathlength is: " + pathlength + ". \n";
+		
+		return resultStr;
 	}
 
 	//not used

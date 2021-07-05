@@ -13,15 +13,16 @@ public class Pathfinder {
 		
 		System.out.println("Graph 1:"+"\n"+graph);
 		
-		System.out.println("Static Points, CHEAPEST path:");
+		//System.out.println("Static Points, CHEAPEST path:");
 		System.out.println(graph.dijkstra(4, 2, Mode.CHEAPEST));
-		System.out.println("Static Points, SHORTEST path:");
+		//System.out.println("Static Points, SHORTEST path:");
 		System.out.println(graph.dijkstra(4, 2, Mode.SHORTEST));
 		
+		System.out.println("##################################");
 		System.out.println("Graph 2:"+"\n"+graph2);
-		System.out.println("Random Points, CHEAPEST path:");
+		//System.out.println("Random Points, CHEAPEST path:");
 		System.out.println(graph2.dijkstraForRandomPoints(Mode.CHEAPEST));
-		System.out.println("Random Points, SHORTEST path:");
+		//System.out.println("Random Points, SHORTEST path:");
 		System.out.println(graph2.dijkstraForRandomPoints(Mode.SHORTEST));
 	}
 	

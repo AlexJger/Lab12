@@ -4,7 +4,6 @@ import java.util.HashMap;
 import pathfinding.WeightedGraph.Mode;
 
 public class Vertex implements Node {
-	
 	private int index;
 	private String name;
 	private HashMap<Vertex, Double> neighbours = new HashMap<>();
@@ -22,7 +21,6 @@ public class Vertex implements Node {
 	}
 	
 	public void reset() {
-		//neighbours.clear();
 		this.explored = false;
 		this.distanceFromStartingNode = Double.POSITIVE_INFINITY;
 		this.previousNode = null;
@@ -40,7 +38,7 @@ public class Vertex implements Node {
 		if(mode==Mode.SHORTEST) {
 			this.explored=true;
 			for(Vertex v : neighbours.keySet()) {
-				if(v.getExplored()==false && v.getDistanceFromStartingNode()>this.getDistanceFromStartingNode())
+				if(v.getExplored()==false && v.getDistanceFromStartingNode()>this.getDistanceFromStartingNode()+1)
 					v.setDistanceAndPrevNode((this.distanceFromStartingNode+1), this);
 			}
 		}
